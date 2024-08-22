@@ -10,10 +10,12 @@ namespace Playground.HLS.Controllers
     public class VideosController : ControllerBase
     {
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IConfiguration _configuration;
 
-        public VideosController(IWebHostEnvironment hostingEnvironment)
+        public VideosController(IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
         {
             _hostingEnvironment = hostingEnvironment;
+            _configuration = configuration;
         }
 
         [HttpPost(Name = "ConvertToHls")]
@@ -21,9 +23,9 @@ namespace Playground.HLS.Controllers
         {
             var uploadedFile = request.File;
             var outputFolderPath = "videos";
-            var exePath = "/usr/bin";//"C:\\ProgramData\\chocolatey\\lib\\ffmpeg\\tools\\ffmpeg\\bin";
+            var exePath = _configuration.GetSection("FFmpeg")["Path"];
             FFmpeg.SetExecutablesPath(exePath);
-            string baseDirectory = Path.Combine(_hostingEnvironment.ContentRootPath, "Videos");
+            string baseDirectory = Path.Combine(_hostingEnvironment.ContentRootPath, "videos");
 
             // Create directories if they don't exist
             Directory.CreateDirectory(Path.Combine(baseDirectory, "TempVideos"));
