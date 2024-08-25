@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddJahezMultiMedia(options =>
+builder.Services.AddMultiMedia(options =>
 {
     options.ContentRootPath = Path.Combine(builder.Environment.ContentRootPath, "videos");
     options.TempFilePath = Path.Combine(builder.Environment.ContentRootPath, "videos", "TempVideos");

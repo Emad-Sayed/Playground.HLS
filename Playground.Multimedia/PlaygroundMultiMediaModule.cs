@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 namespace Playground.Multimedia
 {
-    public static class JahezMultiMediaModule
+    public static class PlaygroundMultiMediaModule
     {
-        public static void AddJahezMultiMedia(this IServiceCollection service,Action<MultiMediaOptions> options)
+        public static void AddMultiMedia(this IServiceCollection service,Action<MultiMediaOptions> options)
         {
             var configuration = new MultiMediaOptions();
             options(configuration);
