@@ -2,6 +2,6 @@
 {
     public interface IMediaConverter
     {
-        Task ConvertToHLS(byte[] file, string fileName);
+        Task ConvertToHLS(byte[] file, string fileName, int chunkDuration = 10);
     }
 }

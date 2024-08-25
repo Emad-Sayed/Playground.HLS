@@ -14,7 +14,7 @@ namespace Playground.Multimedia
             _ioHelper = ioHelper;
         }
 
-        public async Task ConvertToHLS(byte[] file, string fileName)
+        public async Task ConvertToHLS(byte[] file, string fileName,int chunkDuration)
         {
 
             var tempFilePath = await _ioHelper.CreateTempFile(file, Path.GetFileNameWithoutExtension(fileName));
@@ -26,7 +26,7 @@ namespace Playground.Multimedia
                 var conversion = FFmpeg.Conversions.New()
                     .AddParameter($"-i \"{tempFilePath}\"")
                     .AddParameter("-codec: copy")
-                    .AddParameter($"-f hls -hls_time 10 -hls_playlist_type vod \"{output}\"");
+                    .AddParameter($"-f hls -hls_time {chunkDuration} -hls_playlist_type vod \"{output}\"");
 
                 await conversion.Start();
             }
