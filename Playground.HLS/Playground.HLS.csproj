@@ -18,4 +18,8 @@
     <Folder Include="videos\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Playground.Multimedia\Playground.Multimedia.csproj" />
+  </ItemGroup>
+
 </Project>
