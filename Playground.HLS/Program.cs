@@ -12,8 +12,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddJahezMultiMedia(options =>
 {
     options.ContentRootPath = Path.Combine(builder.Environment.ContentRootPath, "videos");
+    options.TempFilePath = Path.Combine(builder.Environment.ContentRootPath, "videos", "TempVideos");
     options.FFmpegPath = builder.Configuration.GetSection("FFmpeg")["Path"];
-    options.Outputpath = Path.Combine(builder.Environment.ContentRootPath, "videos", "HLS");
+    options.Outputpath = Path.Combine(builder.Environment.ContentRootPath, "videos");
 });
 builder.Services.AddCors(options =>
 {

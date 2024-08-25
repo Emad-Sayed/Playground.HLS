@@ -8,7 +8,7 @@ namespace Playground.Multimedia
 {
     public interface IInputOutputHelper
     {
-          Task<string> CreateTempFile(byte[] file, string fileName);
+          Task<string> CreateTempFile(byte[] file, string fileName,string extension);
           void RemoveTempFile(string fileName);
     }
 }

@@ -14,15 +14,15 @@ namespace Playground.Multimedia
         {
             _options = options;
         }
-        public async Task<string> CreateTempFile(byte[] file, string fileName)
+        public async Task<string> CreateTempFile(byte[] file, string fileName , string extension)
         {
             try
             {
                 var exePath = _options.FFmpegPath;
                 FFmpeg.SetExecutablesPath(exePath);
-                Directory.CreateDirectory(Path.Combine(_options.ContentRootPath, _options.TempFilePath));
+                Directory.CreateDirectory(Path.Combine(_options.TempFilePath));
 
-                string tempInputFilePath = Path.Combine(_options.ContentRootPath, _options.TempFilePath, $"{fileName}.mp4");
+                string tempInputFilePath = Path.Combine(_options.TempFilePath, $"{fileName}.{extension}");
 
                 await File.WriteAllBytesAsync(tempInputFilePath, file);
 

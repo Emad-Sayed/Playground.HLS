@@ -32,7 +32,7 @@ namespace Playground.HLS.Controllers
                 await request.File.CopyToAsync(memoryStream);
                 filesAsBytes = memoryStream.ToArray();
             }
-            await _mediaConverter.ConvertToHLS(filesAsBytes, request.File.FileName);
+            await _mediaConverter.ConvertToHLS(filesAsBytes, Path.Combine("HLS", request.File.FileName));
             return Ok();
 
         }
@@ -81,53 +81,23 @@ namespace Playground.HLS.Controllers
         [HttpPost(Name = "SaveVideoWithWaterMark")]
         public async Task<IActionResult> SaveVideoWithWaterMark([FromForm] UploadVideoWithWatermark request)
         {
-            var uploadedFile = request.File;
-            var exePath = _configuration.GetSection("FFmpeg")["Path"];
-            FFmpeg.SetExecutablesPath(exePath);
-            string baseDirectory = Path.Combine(_hostingEnvironment.ContentRootPath, "videos");
 
-            // Create directories if they don't exist
-            Directory.CreateDirectory(Path.Combine(baseDirectory, "TempVideos"));
-            Directory.CreateDirectory(Path.Combine(baseDirectory, Path.GetFileName(uploadedFile.FileName)));
-
-            string tempInputFilePath = Path.Combine(baseDirectory, "TempVideos", Path.GetFileName(uploadedFile.FileName));
-            string tempWatermarkFilePath = Path.Combine(baseDirectory, "Watermarks", "OIP.jfif");
-            string outputFilePath = Path.Combine(baseDirectory, Path.GetFileName(uploadedFile.FileName), "watermarked_" + Path.GetFileName(uploadedFile.FileName));
-
-            try
+            byte[] filesAsBytes;
+            byte[] filesAsBytesWaterMark;
+            using (var memoryStream = new MemoryStream())
             {
-                using (var stream = new FileStream(tempInputFilePath, FileMode.Create))
-                {
-                    await uploadedFile.CopyToAsync(stream);
-                }
-
-
-                // Set up the FFmpeg conversion with a watermark
-                var conversion = FFmpeg.Conversions.New()
-                    .AddParameter($"-i \"{tempInputFilePath}\"")
-                    .AddParameter($"-i \"{tempWatermarkFilePath}\"")
-                    .AddParameter("-filter_complex \"overlay=10:10\"")
-                    .AddParameter($"\"{outputFilePath}\"");
-
-                // Start the conversion
-                await conversion.Start();
-
-                // Return success response
-                return Ok(new { Message = "Video saved with watermark successfully.", FilePath = outputFilePath });
+                await request.File.CopyToAsync(memoryStream);
+                filesAsBytes = memoryStream.ToArray();
             }
-            catch (Exception ex)
+            using (var memoryStream = new MemoryStream())
             {
-                // Handle the exception
-                return StatusCode(500, new { Message = "An error occurred while processing the video.", Error = ex.Message });
+                await request.WaterMark.CopyToAsync(memoryStream);
+                filesAsBytesWaterMark = memoryStream.ToArray();
             }
-            finally
-            {
-                // Clean up the temporary files
-                if (System.IO.File.Exists(tempInputFilePath))
-                {
-                    System.IO.File.Delete(tempInputFilePath);
-                }
-            }
+            await _mediaConverter.AddWatermarkToVideo(filesAsBytes, Path.Combine("Watermarks", request.File.FileName),
+                filesAsBytesWaterMark, request.File.FileName);
+            return Ok();
+
         }
 
     }

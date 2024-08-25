@@ -14,10 +14,10 @@ namespace Playground.Multimedia
             _ioHelper = ioHelper;
         }
 
-        public async Task ConvertToHLS(byte[] file, string fileName,int chunkDuration)
+        public async Task ConvertToHLS(byte[] file, string fileName, int chunkDuration)
         {
 
-            var tempFilePath = await _ioHelper.CreateTempFile(file, Path.GetFileNameWithoutExtension(fileName));
+            var tempFilePath = await _ioHelper.CreateTempFile(file, Path.GetFileNameWithoutExtension(fileName), "mp4");
             try
             {
                 var outputPath = Path.Combine(_options.Outputpath, fileName);
@@ -37,6 +37,37 @@ namespace Playground.Multimedia
             finally
             {
                 _ioHelper.RemoveTempFile(tempFilePath);
+            }
+
+        }
+        public async Task AddWatermarkToVideo(byte[] file, string fileName, byte[] waterMark, string waterMarkFileName, string overlay = "10:10")
+        {
+
+            var tempFilePath = await _ioHelper.CreateTempFile(file, Path.GetFileNameWithoutExtension(fileName), "mp4");
+            var tempFilePathWaterMarkPath = await _ioHelper.CreateTempFile(waterMark, Path.GetFileNameWithoutExtension(waterMarkFileName), "jpg");
+            try
+            {
+                var outputPath = Path.Combine(_options.Outputpath, fileName);
+                Directory.CreateDirectory(outputPath);
+                string outputFilePath = Path.Combine(outputPath, Path.GetFileName(fileName));
+
+                var conversion = FFmpeg.Conversions.New()
+                    .AddParameter($"-i \"{tempFilePath}\"")
+                    .AddParameter($"-i \"{tempFilePathWaterMarkPath}\"")
+                    .AddParameter($"-filter_complex \"overlay={overlay}\"")
+                    .AddParameter($"\"{outputFilePath}\"");
+
+                // Start the conversion
+                await conversion.Start();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                _ioHelper.RemoveTempFile(tempFilePath);
+                _ioHelper.RemoveTempFile(tempFilePathWaterMarkPath);
             }
 
         }
