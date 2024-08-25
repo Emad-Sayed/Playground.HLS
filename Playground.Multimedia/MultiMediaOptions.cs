@@ -9,7 +9,7 @@ namespace Playground.Multimedia
     public class MultiMediaOptions
     {
         public string ContentRootPath { get; set; }
-        public string TempFilePath { get; set; }
+        public string TempFilePath { get; set; } = Path.GetTempPath();
         public string Outputpath { get; set; }
         public string FFmpegPath { get; set; }
     }
