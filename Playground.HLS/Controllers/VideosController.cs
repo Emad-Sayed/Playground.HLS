@@ -36,48 +36,6 @@ namespace Playground.HLS.Controllers
             return Ok();
 
         }
-        [HttpPost(Name = "Downgrade")]
-        public async Task DowngradeVideoQuality([FromForm] DowngradeVideo request)
-        {
-            var uploadedFile = request.File;
-            var outputFolderPath = "videos";
-            var exePath = _configuration.GetSection("FFmpeg")["Path"];
-            FFmpeg.SetExecutablesPath(exePath);
-            string baseDirectory = Path.Combine(_hostingEnvironment.ContentRootPath, "videos");
-
-            // Create directories if they don't exist
-            Directory.CreateDirectory(Path.Combine(baseDirectory, "TempVideos"));
-            Directory.CreateDirectory(Path.Combine(baseDirectory, Path.GetFileName(uploadedFile.FileName)));
-
-            string tempInputFilePath = Path.Combine(baseDirectory, "TempVideos", Path.GetFileName(uploadedFile.FileName));
-            string outputFilePath = Path.Combine(baseDirectory, "Downgraded", Path.GetFileName(uploadedFile.FileName));
-
-            Directory.CreateDirectory(outputFolderPath);
-
-
-            using (var stream = new FileStream(tempInputFilePath, FileMode.Create))
-            {
-                await request.File.CopyToAsync(stream);
-            }
-
-
-            // Build the conversion command
-            var conversion = FFmpeg.Conversions.New()
-                .AddParameter($"-i \"{tempInputFilePath}\"")  // Input file
-                .AddParameter($"-b:v {request.Bitrate}k")     // Video bitrate (e.g., 500k for 500 kbps)
-                .AddParameter($"-vf scale={request.Width}:{request.Height}")  // Resize video
-                .AddParameter($"\"{outputFilePath}\"");   // Output file
-
-            try
-            {
-                await conversion.Start();
-                Console.WriteLine("Video quality downgraded successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error during video processing: {ex.Message}");
-            }
-        }
         [HttpPost(Name = "SaveVideoWithWaterMark")]
         public async Task<IActionResult> SaveVideoWithWaterMark([FromForm] UploadVideoWithWatermark request)
         {
@@ -97,6 +55,20 @@ namespace Playground.HLS.Controllers
             await _mediaConverter.AddWatermarkToVideo(filesAsBytes, Path.Combine("Watermarks", request.File.FileName),
                 filesAsBytesWaterMark, request.File.FileName);
             return Ok();
+
+        }
+        [HttpPost(Name = "GetVideoDuration")]
+        public async Task<IActionResult> GetVideoDuration([FromForm] GetVideoMetaData request)
+        {
+
+            byte[] filesAsBytes;
+            using (var memoryStream = new MemoryStream())
+            {
+                await request.File.CopyToAsync(memoryStream);
+                filesAsBytes = memoryStream.ToArray();
+            }
+            var result = await _mediaConverter.GetMediaInfo(filesAsBytes, request.File.FileName);
+            return Ok(result);
 
         }
 

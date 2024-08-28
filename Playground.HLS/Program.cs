@@ -10,12 +10,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMultiMedia(options =>
-{
-    options.ContentRootPath = Path.Combine(builder.Environment.ContentRootPath, "videos");
-    options.TempFilePath = Path.Combine(builder.Environment.ContentRootPath, "videos", "TempVideos");
-    options.FFmpegPath = builder.Configuration.GetSection("FFmpeg")["Path"];
-    options.Outputpath = Path.Combine(builder.Environment.ContentRootPath, "videos");
-});
+    options.SetPaths(builder.Configuration.GetSection("FFmpeg")["Path"], Path.Combine(builder.Environment.ContentRootPath, "videos"),
+         Path.Combine(builder.Environment.ContentRootPath, "videos"), Path.Combine(builder.Environment.ContentRootPath, "videos", "TempVideos"))
+);
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>

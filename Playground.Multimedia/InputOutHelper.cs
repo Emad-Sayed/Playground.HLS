@@ -18,8 +18,6 @@ namespace Playground.Multimedia
         {
             try
             {
-                var exePath = _options.FFmpegPath;
-                FFmpeg.SetExecutablesPath(exePath);
                 Directory.CreateDirectory(Path.Combine(_options.TempFilePath));
 
                 string tempInputFilePath = Path.Combine(_options.TempFilePath, $"{fileName}.{extension}");

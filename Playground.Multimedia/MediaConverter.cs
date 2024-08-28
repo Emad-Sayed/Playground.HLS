@@ -71,5 +71,28 @@ namespace Playground.Multimedia
             }
 
         }
+
+        public async Task<MediaInfoResult> GetMediaInfo(byte[] file, string fileName)
+        {
+            var tempFilePath = await _ioHelper.CreateTempFile(file, Path.GetFileNameWithoutExtension(fileName), "mp4");
+            MediaInfoResult mediaInfo = new MediaInfoResult();
+            try
+            {
+
+                mediaInfo.MediaInfo = await FFmpeg.GetMediaInfo(tempFilePath);
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                _ioHelper.RemoveTempFile(tempFilePath);
+            }
+            return mediaInfo;
+
+        }
     }
 }
